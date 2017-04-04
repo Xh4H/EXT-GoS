@@ -14,9 +14,6 @@ local function Update()
 	return
 end
 
-if AvVersion < GetVersion("AsyncVeigarV.c") then
-	Update()	
-end
 
 --print(GetWebResultAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c"))
 
