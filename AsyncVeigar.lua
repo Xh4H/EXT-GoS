@@ -3,11 +3,9 @@ local AvVersion = "0.0.1"
 local function GetVersion(name)
 	local file = ""
 	file = io.open(COMMON_PATH..name, "rb")
-	if not file then return end
 	local content = file:read "*all"
 	file:close()
-	print(content)
-	return tostring(content)
+	return tostring(content) or AvVersion
 end
 
 local function Update()
