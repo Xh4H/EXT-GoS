@@ -1125,6 +1125,7 @@ function Veigar:modes()
 					self:castW(target)
 				end
 			end
+			--[[
 			if self.Menu._HARASS._E.eBool:Value() == true then
 				local target = GetTarget(self.spell["_E"].range)
 				if target == nil then return end
@@ -1132,7 +1133,7 @@ function Veigar:modes()
 					self:castE(target)
 				end 
 			end
-		end,
+		end,]]
 		["LaneClear"] = function() 
 			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
 				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
