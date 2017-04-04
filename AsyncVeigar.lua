@@ -196,6 +196,17 @@ function MinionsOnLine(startpos, endpos, width, team)
 	return Count
 end
 
+function MinionsAround(pos, range, team)
+	local Count = 0
+	for i = 1, Game.MinionCount() do
+		local m = Game.Minion(i)
+		if m and m.team == team and not m.dead and GetDistance(pos, m.pos) <= range then
+			Count = Count + 1
+		end
+	end
+	return Count
+end
+
 function GetBestCircularFarmPos(range, radius)
 	local BestPos = nil
 	local MostHit = 0
