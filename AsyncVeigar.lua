@@ -3,6 +3,7 @@ local AvVersion = "0.0.1"
 local function GetVersion(name)
 	local file = ""
 	file = io.open(COMMON_PATH..name, "rb")
+	if not file then return end
 	local content = file:read "*all"
 	file:close()
 	return tostring(content) or AvVersion
@@ -23,11 +24,11 @@ if not FileExist(COMMON_PATH.."Collision.lua") then
 	return
 end
 
-DownloadFileAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c", COMMON_PATH.."AsyncVeigarV.c", function() end)
+DownloadFileAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c", COMMON_PATH.."AsyncVeigarV.c", function() DelayAction()(function() print("Downloaded") end,.1) end)
 
 DelayAction(function() 
 	if AvVersion < GetVersion("AsyncVeigarV.c") then
-		Update()
+		--Update()
 	end
 end, 0.15)
 
