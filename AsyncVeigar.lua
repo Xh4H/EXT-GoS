@@ -24,7 +24,7 @@ if not FileExist(COMMON_PATH.."Collision.lua") then
 	return
 end
 
-DownloadFileAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c", COMMON_PATH.."AsyncVeigarV.c", function() DelayAction()(function() print("Downloaded") end,.1) end)
+--DownloadFileAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c", COMMON_PATH.."AsyncVeigarV.c", function() DelayAction()(function() print("Downloaded") end,.1) end)
 
 DelayAction(function() 
 	if AvVersion < GetVersion("AsyncVeigarV.c") then
