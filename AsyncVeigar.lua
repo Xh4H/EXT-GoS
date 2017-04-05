@@ -19,8 +19,8 @@ end
 --print(GetWebResultAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c"))
 
 if not FileExist(COMMON_PATH.."Collision.lua") then
-	print("AsyncVeigar - Required files are being downloaded. Please wait, should be done within a few seconds.")
-	DownloadFileAsync("https://raw.githubusercontent.com/Maxxxel/GOS/master/ext/Common/Collision.lua", COMMON_PATH.."Collision.lua", function() end)
+	error("Collision file is missing.")
+	--DownloadFileAsync("https://raw.githubusercontent.com/Maxxxel/GOS/master/ext/Common/Collision.lua", COMMON_PATH.."Collision.lua", function() end)
 	return
 end
 
