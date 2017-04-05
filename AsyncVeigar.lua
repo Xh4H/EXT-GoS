@@ -1124,7 +1124,7 @@ function Veigar:modes()
 					end
 					self:castW(target)
 				end
-			end
+			end,
 			--[[
 			if self.Menu._HARASS._E.eBool:Value() == true then
 				local target = GetTarget(self.spell["_E"].range)
