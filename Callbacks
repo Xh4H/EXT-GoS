@@ -114,9 +114,9 @@ function Animation:Tick()
 		local hero = Game.Hero(i)
 		local netID = hero.networkID
 		if hero.activeSpellSlot then
-			local _animation = hero.activeSpell.animation
+			local _animation = hero.activeSpell.animationTime
 			if _ANIMATION_TABLE[netID] and _ANIMATION_TABLE[netID].animation ~= _animation then
-				self:Animating(hero, hero.activeSpell.animation)
+				self:Animating(hero, hero.activeSpell.animationTime)
 				_ANIMATION_TABLE[netID].animation = _animation
 			end
 		end
