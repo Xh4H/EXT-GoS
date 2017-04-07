@@ -27,8 +27,7 @@ function Vision:Tick()
 				if hero.visible == false and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == true then
 					_VISION_TABLE[netID] = {visible = hero.visible}
 					self:LoseVision(hero)
-				elseif 
-					hero.visible == true and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == false then
+				elseif hero.visible == true and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == false then
 					_VISION_TABLE[netID] = {visible = hero.visible}
 					self:GainVision(hero)
 				end
