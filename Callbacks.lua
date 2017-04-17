@@ -34,6 +34,7 @@ _G._SPELL_TABLE_PROCESS = {}
 _G._ANIMATION_TABLE = {}
 _G._VISION_TABLE = {}
 _G._LEVEL_UP_TABLE = {}
+_G._ITEM_TABLE = {}
 
 
   class 'BuffExplorer'
@@ -220,6 +221,54 @@ function LevelUp:LevelUpCallback(unit, level)
 	end
 end
 
+class("ItemEvents")
+
+function ItemEvents:__init()
+	self.BuyItemCallback = {}
+	self.SellItemCallback = {}
+	_G._ITEM_CHECKER_STARTED = true
+	for i = ITEM_1, ITEM_7 do
+		if myHero:GetItemData(i).itemID ~= 0 then
+			_ITEM_TABLE[i] = {has = true, data = myHero:GetItemData(i)}
+		else
+			_ITEM_TABLE[i] = {has = false, data = nil}
+		end
+	end
+
+	Callback.Add("Tick", function () self:Tick() end)
+end
+
+function ItemEvents:Tick()
+	for i = ITEM_1, ITEM_7 do
+		if myHero:GetItemData(i).itemID ~= 0 then
+			if _ITEM_TABLE[i].has == false then
+				_ITEM_TABLE[i].has = true
+				_ITEM_TABLE[i].data = myHero:GetItemData(i)
+				self:BuyItem(myHero:GetItemData(i), i)
+			end
+		else
+			if _ITEM_TABLE[i].has == true then
+				self:SellItem(_ITEM_TABLE[i].data, i)
+				_ITEM_TABLE[i].has = false
+				_ITEM_TABLE[i].data = nil
+			end
+		end
+	end
+end
+
+
+function ItemEvents:BuyItem(item, slot)
+	for _, Emit in pairs(self.BuyItemCallback) do
+		Emit(item, slot)
+	end
+end
+
+function ItemEvents:SellItem(item, slot)
+	for _, Emit in pairs(self.SellItemCallback) do
+		Emit(item, slot)
+	end
+end
+
 
 function OnLevelUp(fn)
 	table.insert(LevelUp.OnLevelUpCallback, fn)
@@ -244,6 +293,14 @@ function OnRemoveBuff(cb)
 	table.insert(BuffExplorer.RemoveBuffCallback,cb)
 end
 
+function OnBuyItem(fn)
+	table.insert(ItemEvents.BuyItemCallback, fn)
+end
+
+function OnSellItem(fn)
+	table.insert(ItemEvents.SellItemCallback, fn)
+end
+
 
 local curCallbacks = {
 	["levelup"] = function()
@@ -266,6 +323,11 @@ local curCallbacks = {
 			_G.Vision = Vision()
 		end
 	end,
+	["item"] = function()
+		if not _ITEM_CHECKER_STARTED then  
+			_G.ItemEvents = ItemEvents()
+		end
+	end
 }
 
 return {
