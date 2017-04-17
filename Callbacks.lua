@@ -34,8 +34,6 @@ _G._SPELL_TABLE_PROCESS = {}
 _G._ANIMATION_TABLE = {}
 _G._VISION_TABLE = {}
 _G._LEVEL_UP_TABLE = {}
-_G._ITEM_TABLE = {}
-
 
 
   class 'BuffExplorer'
@@ -67,23 +65,27 @@ _G._ITEM_TABLE = {}
 	end
 	
 	function BuffExplorer:Tick()
-		for _, hero in pairs(self.Heroes) do
-			for i = 0, hero.buffCount do
-				local buff = hero:GetBuff(i)
-				if self:Valid(buff) then
-					if not self.Buffs[hero.networkID][buff.name] or (self.Buffs[hero.networkID][buff.name] and self.Buffs[hero.networkID][buff.name].expireTime ~= buff.expireTime) then
-						self.Buffs[hero.networkID][buff.name] = {expireTime = buff.expireTime, sent = true, networkID = buff.sourcenID, buff = buff}
-						self:UpdateBuff(hero,buff)
+		if self.UpdateBuffCallback ~= {} then
+			for _, hero in pairs(self.Heroes) do
+				for i = 0, hero.buffCount do
+					local buff = hero:GetBuff(i)
+					if self:Valid(buff) then
+						if not self.Buffs[hero.networkID][buff.name] or (self.Buffs[hero.networkID][buff.name] and self.Buffs[hero.networkID][buff.name].expireTime ~= buff.expireTime) then
+							self.Buffs[hero.networkID][buff.name] = {expireTime = buff.expireTime, sent = true, networkID = buff.sourcenID, buff = buff}
+							self:UpdateBuff(hero,buff)
+						end
 					end
 				end
 			end
 		end
-		for _, hero in pairs(self.Heroes) do
-			for buffname,buffinfo in pairs(self.Buffs[hero.networkID]) do
-				if buffinfo.expireTime < Game.Timer() then
-					self:RemoveBuff(hero,buffinfo.buff)
-					self.Buffs[hero.networkID][buffname] = nil
-					
+		if self.RemoveBuffCallback ~= {} then
+			for _, hero in pairs(self.Heroes) do
+				for buffname,buffinfo in pairs(self.Buffs[hero.networkID]) do
+					if buffinfo.expireTime < Game.Timer() then
+						self:RemoveBuff(hero,buffinfo.buff)
+						self.Buffs[hero.networkID][buffname] = nil
+						
+					end
 				end
 			end
 		end
@@ -111,14 +113,16 @@ function Animation:__init()
 end
 
 function Animation:Tick()
-	for i = 0, Game.HeroCount() do
-		local hero = Game.Hero(i)
-		local netID = hero.networkID
-		if hero.activeSpellSlot then
-			local _animation = hero.attackData.animationTime
-			if _ANIMATION_TABLE[netID] and _ANIMATION_TABLE[netID].animation ~= _animation then
-				self:Animating(hero, hero.attackData.animationTime)
-				_ANIMATION_TABLE[netID].animation = _animation
+	if self.OnAnimationCallback ~= {} then
+		for i = 0, Game.HeroCount() do
+			local hero = Game.Hero(i)
+			local netID = hero.networkID
+			if hero.activeSpellSlot then
+				local _animation = hero.attackData.animationTime
+				if _ANIMATION_TABLE[netID] and _ANIMATION_TABLE[netID].animation ~= _animation then
+					self:Animating(hero, hero.attackData.animationTime)
+					_ANIMATION_TABLE[netID].animation = _animation
+				end
 			end
 		end
 	end
@@ -152,12 +156,17 @@ function Vision:Tick()
 		local hero = Game.Hero(i)
 		if hero then
 			local netID = hero.networkID
-			if hero.visible == false and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == true then
-				_VISION_TABLE[netID] = {visible = hero.visible}
-				self:LoseVision(hero)
-			elseif hero.visible == true and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == false then
-				_VISION_TABLE[netID] = {visible = hero.visible}
-				self:GainVision(hero)
+			if self.LoseVisionCallback ~= {} then
+				if hero.visible == false and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == true then
+					_VISION_TABLE[netID] = {visible = hero.visible}
+					self:LoseVision(hero)
+				end
+			end
+			if self.GainVisionCallback ~= {} then
+				if hero.visible == true and _VISION_TABLE[netID] and _VISION_TABLE[netID].visible == false then
+					_VISION_TABLE[netID] = {visible = hero.visible}
+					self:GainVision(hero)
+				end
 			end
 		end
 	end
@@ -192,13 +201,15 @@ function LevelUp:__init()
 end
 
 function LevelUp:Tick()
-	for i = 0, Game.HeroCount() do
-		local hero = Game.Hero(i)
-		local level = hero.levelData.lvl
-		local netID = hero.networkID
-		if _LEVEL_UP_TABLE[netID] and level and _LEVEL_UP_TABLE[netID].level ~= level then
-			self:LevelUpCallback(hero, hero.levelData)
-			_LEVEL_UP_TABLE[netID].level = level
+	if self.OnLevelUpCallback ~= {} then
+		for i = 0, Game.HeroCount() do
+			local hero = Game.Hero(i)
+			local level = hero.levelData.lvl
+			local netID = hero.networkID
+			if _LEVEL_UP_TABLE[netID] and level and _LEVEL_UP_TABLE[netID].level ~= level then
+				self:LevelUpCallback(hero, hero.levelData)
+				_LEVEL_UP_TABLE[netID].level = level
+			end
 		end
 	end
 end
@@ -209,82 +220,6 @@ function LevelUp:LevelUpCallback(unit, level)
 	end
 end
 
-
-class("ItemEvents")
-
-function ItemEvents:__init()
-	self.BuyItemCallback = {}
-	self.SellItemCallback = {}
-	_G._ITEM_CHECKER_STARTED = true
-	for i = ITEM_1, ITEM_7 do
-		if myHero:GetItemData(i).itemID ~= 0 then
-			_ITEM_TABLE[i] = {has = true, data = myHero:GetItemData(i)}
-		else
-			_ITEM_TABLE[i] = {has = false, data = nil}
-		end
-	end
-
-	Callback.Add("Tick", function () self:Tick() end)
-end
-
-function ItemEvents:Tick()
-	for i = ITEM_1, ITEM_7 do
-		if myHero:GetItemData(i).itemID ~= 0 then
-			if _ITEM_TABLE[i].has == false then
-				_ITEM_TABLE[i].has = true
-				_ITEM_TABLE[i].data = myHero:GetItemData(i)
-				self:BuyItem(myHero:GetItemData(i), i)
-			end
-		else
-			if _ITEM_TABLE[i].has == true then
-				self:SellItem(_ITEM_TABLE[i].data, i)
-				_ITEM_TABLE[i].has = false
-				_ITEM_TABLE[i].data = nil
-			end
-		end
-	end
-end
-
-
-function ItemEvents:BuyItem(item, slot)
-	for _, Emit in pairs(self.BuyItemCallback) do
-		Emit(item, slot)
-	end
-end
-
-function ItemEvents:SellItem(item, slot)
-	for _, Emit in pairs(self.SellItemCallback) do
-		Emit(item, slot)
-	end
-end
-
-
-if not _ITEM_CHECKER_STARTED then  
-	_G.ItemEvents = ItemEvents()
-end
-
-if not _LEVEL_UP_START then  
-	_G.LevelUp = LevelUp()
-end
-
-if not __BuffExplorer_Loaded then	
-	_G.BuffExplorer = BuffExplorer() 
-end	
-if not _ANIMATION_STARTED then  
-	_G.Animation = Animation()
-end
-if not _VISION_STARTED then  
-	_G.Vision = Vision()
-end
-
-
-function OnBuyItem(fn)
-	table.insert(ItemEvents.BuyItemCallback, fn)
-end
-
-function OnSellItem(fn)
-	table.insert(ItemEvents.SellItemCallback, fn)
-end
 
 function OnLevelUp(fn)
 	table.insert(LevelUp.OnLevelUpCallback, fn)
@@ -308,3 +243,40 @@ end
 function OnRemoveBuff(cb)
 	table.insert(BuffExplorer.RemoveBuffCallback,cb)
 end
+
+
+local curCallbacks = {
+	["levelup"] = function()
+		if not _LEVEL_UP_START then  
+			_G.LevelUp = LevelUp()
+		end
+	end,
+	["buffexplorer"] = function()
+		if not __BuffExplorer_Loaded then	
+			_G.BuffExplorer = BuffExplorer() 
+		end	
+	end,
+	["animation"] = function()
+		if not _ANIMATION_STARTED then  
+			_G.Animation = Animation()
+		end
+	end,
+	["vision"] = function()
+		if not _VISION_STARTED then  
+			_G.Vision = Vision()
+		end
+	end,
+}
+
+return {
+	["Load"] = function(tbl)
+		for index, event in pairs(tbl) do
+			if curCallbacks[event:lower()] then
+				curCallbacks[event:lower()]()
+				print(event .. " callback loaded.")
+			end
+		end
+	end
+}
+
+-- PARA EL SHIELD HACER UNIT.BUFF DE SOLO ESE Y HACER CHECK DEL NOMBRE, MIRAR SIVIR E
