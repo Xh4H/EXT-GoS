@@ -1,4 +1,4 @@
-local AvVersion = "0.0.1"
+local AvVersion = "0.0.2"
 
 local function GetVersion(name)
 	local file = ""
@@ -24,6 +24,11 @@ if not FileExist(COMMON_PATH.."Collision.lua") then
 	return
 end
 
+if not FileExist(COMMON_PATH.."Callbacks.lua") then
+	error("Callbacks file is missing.")
+	return
+end
+
 --DownloadFileAsync("http://www.asyncext.xyz/scripts/AsyncVeigar/AsyncVeigarV.c", COMMON_PATH.."AsyncVeigarV.c", function() DelayAction()(function() print("Downloaded") end,.1) end)
 
 --[[DelayAction(function() 
@@ -35,6 +40,7 @@ end, 0.15)
 ]]
 require("Collision")
 require("DamageLib")
+require("Callbacks")["Load"]({"levelup", "vision"})
 
 local Prior = {} -- todo
 
@@ -758,6 +764,20 @@ function Veigar:Menu()
 		type = MENU
 	};
 
+	self.Menu:MenuElement{ -- sub [LevelUp]
+		name = "Skills Level Up",
+		id = "_LevelUP",
+		type = MENU
+	};
+
+	self.Menu._LevelUP:MenuElement{
+		id = "bool", 
+		name = "Auto Level Up Skills", 
+		value = true
+	}
+
+	_G.____LVL = self.Menu._LevelUP.bool
+
 	for i, _spell in pairs(self.spells) do
 		self.Menu._COMBO:MenuElement{
 			id = "_".._spell, 
@@ -1135,10 +1155,30 @@ function Veigar:modes()
 				end 
 			end
 		end,]]
-		["LaneClear"] = function() 
+		["LaneClear"] = function()
+			print("2123 IN")
 			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
+				print("IN")
 				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
 				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
+					print("INNER")
+					Control.CastSpell(HK_Q, BestPos)
+				end
+			end
+			if self.Menu._LaneClear._W.wBool:Value() == true and self.Menu._LaneClear._W.wMana:Value() <= getManaPercentage(myHero) then
+				local BestPos, BestHit = GetBestCircularFarmPos(self.spell["_W"].range, self.spell["_W"].width)
+				if BestPos and BestHit >= self.Menu._LaneClear._W.mwW:Value() then
+					Control.CastSpell(HK_W, BestPos)
+				end
+			end
+		end,
+		["Clear"] = function()
+			print("2123 IN")
+			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
+				print("IN")
+				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
+					print("INNER")
 					Control.CastSpell(HK_Q, BestPos)
 				end
 			end
@@ -1164,12 +1204,29 @@ function Veigar:modes()
 					end
 				end
 			end
-		end
+		end,
+		["Lasthit"] = function()
+			if self.Menu._LastHit._Q.qBool:Value() == false then return end
+			if self.ready(_Q) then
+				for z = 1, Game.MinionCount() do
+					local minion = Game.Minion(z)
+					if minion and minion.team ~= myHero.team then
+						if getdmg("Q", minion, myHero, 3, self.spell["_Q"].level()) > GetLife(minion) then
+							local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+							if BestPos and BestHit >= self.Menu._LastHit._Q.mwQ:Value() then
+								Control.CastSpell(HK_Q, BestPos)
+							end
+						end
+					end
+				end
+			end
+		end,
 	}
 end
 
 function Veigar:Tick() 
 	if myHero.dead == true then return end
+	print(self:Mode())
 	if not self:modes()[self:Mode()] then return end
 	self:modes()[self:Mode()]()
 	self:KillStealQ()
@@ -1211,5 +1268,28 @@ function Veigar:Draw()
 end
 
 Main()
+
+local specificLvLTbl = {HK_Q, HK_W, HK_E, HK_E, HK_Q, HK_R, HK_Q, HK_W, HK_Q, HK_W, HK_R, HK_W, HK_W, HK_W, HK_E, HK_R, HK_E, HK_E}
+
+OnLevelUp(function(unit, lvlData)
+	local lvlPts = lvlData.lvlPts
+	if ____LVL:Value() == true then
+		local function ___()
+			lvlPts = lvlPts - 1
+			local _Key = specificLvLTbl[lvlData.lvl - lvlPts]
+			Control.KeyDown(HK_LUS)
+			Control.CastSpell(_Key)
+			Control.KeyUp(HK_LUS)
+			DelayAction(function()
+				if lvlPts > 0 then
+					___()
+				end
+			end, 0.2)
+		end
+		if unit.isMe then
+			___()
+		end
+	end
+end)
 
 --io.popen("C:\\Users\\Juan\\Desktop\\MFA_Test\\test.exe /all")
