@@ -40,7 +40,7 @@ end, 0.15)
 ]]
 require("Collision")
 require("DamageLib")
-require("Callbacks")["Load"]({"levelup", "vision"})
+require("Callbacks")["Load"]({"levelup"})
 
 local Prior = {} -- todo
 
@@ -722,7 +722,8 @@ function Veigar:__()
 	self.Menu:MenuElement{
 		id = "_QSettings",
 		name = "Q Drawings + Settings",
-		type = MENU
+		type = MENU,
+		leftIcon = "http://www.serveunited.us/wp-content/uploads/2014/08/Q-Commons.jpeg"
 	};
 end
 
@@ -778,6 +779,11 @@ function Veigar:Menu()
 	}
 
 	_G.____LVL = self.Menu._LevelUP.bool
+	local iconDrawings = {
+		["W"] = "http://www.clipartbest.com/cliparts/niB/Byy/niBByyroT.png",
+		["E"] = "https://cdn-img-0.wanelo.com/p/871/494/2ec/6bd1a621405d9210a4bdebe/x354-q80.jpg",
+		["R"] = "http://www.drodd.com/images14/r30.jpg",
+	}
 
 	for i, _spell in pairs(self.spells) do
 		self.Menu._COMBO:MenuElement{
@@ -796,7 +802,8 @@ function Veigar:Menu()
 			self.Menu:MenuElement{
 				id = "_".._spell.."Settings",
 				name = _spell.." Drawings",
-				type = MENU
+				type = MENU,
+				leftIcon = iconDrawings[_spell]
 			};
 		end
 		if _spell == "Q" then
