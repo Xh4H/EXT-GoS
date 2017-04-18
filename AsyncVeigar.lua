@@ -271,7 +271,7 @@ function Veigar:__init()
 		end
 	end;
 	self.spells = {"Q", "W", "E", "R"}
-	self.spell = {
+	self.spell = { 
 		["_Q"] = {
 			currentCd = 0,
 			minSpeed = 3.4028234663853e+038,
@@ -363,7 +363,7 @@ function Veigar:__init()
 			targetingType = 1836639352,
 			cd = 0,
 			mana = function() return (myHero:GetSpellData(_R).mana) end,
-			damage = function(hero, target) return (({175, 250, 325})[myHero:GetSpellData(_R).level])*(hero.ap*0.75)+(1)
+			damage = function(hero, target) return (({175, 250, 325})[myHero:GetSpellData(_R).level])+(hero.ap*0.75) + (({175, 250, 325})[myHero:GetSpellData(_R).level])+(hero.ap*0.75)*(1.5*(100-getLifePercentage(target))) end,
 		},
 		["Flash"] = {
 			width = 0,
@@ -1227,7 +1227,7 @@ function Veigar:modes()
 	}
 end
 
-function Veigar:Tick() 
+function Veigar:Tick()
 	if myHero.dead == true then return end
 	self:KillStealQ()
 	self:KillStealR()
