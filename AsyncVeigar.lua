@@ -767,7 +767,8 @@ function Veigar:Menu()
 	self.Menu:MenuElement{ -- sub [LevelUp]
 		name = "Skills Level Up",
 		id = "_LevelUP",
-		type = MENU
+		type = MENU,
+		leftIcon = "https://image.freepik.com/free-icon/double-up-arrow-angles_318-53141.jpg"
 	};
 
 	self.Menu._LevelUP:MenuElement{
@@ -1156,12 +1157,9 @@ function Veigar:modes()
 			end
 		end,]]
 		["LaneClear"] = function()
-			print("2123 IN")
 			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
-				print("IN")
 				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
 				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
-					print("INNER")
 					Control.CastSpell(HK_Q, BestPos)
 				end
 			end
@@ -1173,12 +1171,9 @@ function Veigar:modes()
 			end
 		end,
 		["Clear"] = function()
-			print("2123 IN")
 			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
-				print("IN")
 				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
 				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
-					print("INNER")
 					Control.CastSpell(HK_Q, BestPos)
 				end
 			end
@@ -1226,7 +1221,6 @@ end
 
 function Veigar:Tick() 
 	if myHero.dead == true then return end
-	print(self:Mode())
 	if not self:modes()[self:Mode()] then return end
 	self:modes()[self:Mode()]()
 	self:KillStealQ()
