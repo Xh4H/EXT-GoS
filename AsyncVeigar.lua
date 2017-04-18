@@ -363,6 +363,7 @@ function Veigar:__init()
 			targetingType = 1836639352,
 			cd = 0,
 			mana = function() return (myHero:GetSpellData(_R).mana) end,
+			damage = function(hero, target) return (({175, 250, 325})[myHero:GetSpellData(_R).level])*(hero.ap*0.75)+(1)
 		},
 		["Flash"] = {
 			width = 0,
@@ -1228,11 +1229,11 @@ end
 
 function Veigar:Tick() 
 	if myHero.dead == true then return end
-	if not self:modes()[self:Mode()] then return end
-	self:modes()[self:Mode()]()
 	self:KillStealQ()
 	self:KillStealR()
 	self:AutoQ()
+	if not self:modes()[self:Mode()] then return end
+	self:modes()[self:Mode()]()
 end
 
 function Veigar:Draw()
@@ -1278,6 +1279,7 @@ OnLevelUp(function(unit, lvlData)
 		local function ___()
 			lvlPts = lvlPts - 1
 			local _Key = specificLvLTbl[lvlData.lvl - lvlPts]
+			if not _Key then return end
 			Control.KeyDown(HK_LUS)
 			Control.CastSpell(_Key)
 			Control.KeyUp(HK_LUS)
