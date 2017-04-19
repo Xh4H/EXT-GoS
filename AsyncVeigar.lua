@@ -270,6 +270,7 @@ function Veigar:__init()
 			self.ignite = {false}
 		end
 	end;
+	self.Tick = GetTickCount()
 	self.spells = {"Q", "W", "E", "R"}
 	self.spell = { 
 		["_Q"] = {
@@ -1044,7 +1045,7 @@ end
 
 function Veigar:castR(target)
 	if self.ready(_R) and self.spell["_R"].mana() <= myHero.mana then
-		if self.Menu._COMBO._R.rLife:Value() <= GetLife(target) then
+		if self.Menu._COMBO._R.rLife:Value() <= GetLifePercentage(target) then
 			Control.CastSpell(HK_R, target)
 		end
 	end
@@ -1165,63 +1166,75 @@ function Veigar:modes()
 			end
 		end,]]
 		["LaneClear"] = function()
-			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
-				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
-				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
-					Control.CastSpell(HK_Q, BestPos)
+			if GetTickCount() - self.Tick > 1000 then
+				if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
+					local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+					if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
+						Control.CastSpell(HK_Q, BestPos)
+					end
 				end
-			end
-			if self.Menu._LaneClear._W.wBool:Value() == true and self.Menu._LaneClear._W.wMana:Value() <= getManaPercentage(myHero) then
-				local BestPos, BestHit = GetBestCircularFarmPos(self.spell["_W"].range, self.spell["_W"].width)
-				if BestPos and BestHit >= self.Menu._LaneClear._W.mwW:Value() then
-					Control.CastSpell(HK_W, BestPos)
+				if self.Menu._LaneClear._W.wBool:Value() == true and self.Menu._LaneClear._W.wMana:Value() <= getManaPercentage(myHero) then
+					local BestPos, BestHit = GetBestCircularFarmPos(self.spell["_W"].range, self.spell["_W"].width)
+					if BestPos and BestHit >= self.Menu._LaneClear._W.mwW:Value() then
+						Control.CastSpell(HK_W, BestPos)
+					end
 				end
+				self.Tick = GetTickCount()
 			end
 		end,
 		["Clear"] = function()
-			if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
-				local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
-				if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
-					Control.CastSpell(HK_Q, BestPos)
+			if GetTickCount() - self.Tick > 1000 then
+				if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
+					local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+					if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
+						Control.CastSpell(HK_Q, BestPos)
+					end
 				end
-			end
-			if self.Menu._LaneClear._W.wBool:Value() == true and self.Menu._LaneClear._W.wMana:Value() <= getManaPercentage(myHero) then
-				local BestPos, BestHit = GetBestCircularFarmPos(self.spell["_W"].range, self.spell["_W"].width)
-				if BestPos and BestHit >= self.Menu._LaneClear._W.mwW:Value() then
-					Control.CastSpell(HK_W, BestPos)
+				if self.Menu._LaneClear._W.wBool:Value() == true and self.Menu._LaneClear._W.wMana:Value() <= getManaPercentage(myHero) then
+					local BestPos, BestHit = GetBestCircularFarmPos(self.spell["_W"].range, self.spell["_W"].width)
+					if BestPos and BestHit >= self.Menu._LaneClear._W.mwW:Value() then
+						Control.CastSpell(HK_W, BestPos)
+					end
 				end
+				self.Tick = GetTickCount()
 			end
 		end,
 		["LastHit"] = function()
-			if self.Menu._LastHit._Q.qBool:Value() == false then return end
-			if self.ready(_Q) then
-				for z = 1, Game.MinionCount() do
-					local minion = Game.Minion(z)
-					if minion and minion.team ~= myHero.team then
-						if getdmg("Q", minion, myHero, 3, self.spell["_Q"].level()) > GetLife(minion) then
-							local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
-							if BestPos and BestHit >= self.Menu._LastHit._Q.mwQ:Value() then
-								Control.CastSpell(HK_Q, BestPos)
+			if GetTickCount() - self.Tick > 1000 then
+				if self.Menu._LastHit._Q.qBool:Value() == false then return end
+				if self.ready(_Q) then
+					for z = 1, Game.MinionCount() do
+						local minion = Game.Minion(z)
+						if minion and minion.team ~= myHero.team then
+							if getdmg("Q", minion, myHero, 3, self.spell["_Q"].level()) > GetLife(minion) then
+								local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+								if BestPos and BestHit >= self.Menu._LastHit._Q.mwQ:Value() then
+									Control.CastSpell(HK_Q, BestPos)
+								end
 							end
 						end
 					end
 				end
+				self.Tick = GetTickCount()
 			end
 		end,
 		["Lasthit"] = function()
-			if self.Menu._LastHit._Q.qBool:Value() == false then return end
-			if self.ready(_Q) then
-				for z = 1, Game.MinionCount() do
-					local minion = Game.Minion(z)
-					if minion and minion.team ~= myHero.team then
-						if getdmg("Q", minion, myHero, 3, self.spell["_Q"].level()) > GetLife(minion) then
-							local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
-							if BestPos and BestHit >= self.Menu._LastHit._Q.mwQ:Value() then
-								Control.CastSpell(HK_Q, BestPos)
+			if GetTickCount() - self.Tick > 1000 then
+				if self.Menu._LastHit._Q.qBool:Value() == false then return end
+				if self.ready(_Q) then
+					for z = 1, Game.MinionCount() do
+						local minion = Game.Minion(z)
+						if minion and minion.team ~= myHero.team then
+							if getdmg("Q", minion, myHero, 3, self.spell["_Q"].level()) > GetLife(minion) then
+								local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
+								if BestPos and BestHit >= self.Menu._LastHit._Q.mwQ:Value() then
+									Control.CastSpell(HK_Q, BestPos)
+								end
 							end
 						end
 					end
 				end
+				self.Tick = GetTickCount()
 			end
 		end,
 	}
