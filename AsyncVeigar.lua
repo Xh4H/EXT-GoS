@@ -1045,7 +1045,7 @@ end
 
 function Veigar:castR(target)
 	if self.ready(_R) and self.spell["_R"].mana() <= myHero.mana then
-		if self.Menu._COMBO._R.rLife:Value() <= GetLifePercentage(target) then
+		if self.Menu._COMBO._R.rLife:Value() <= getLifePercentage(target) then
 			Control.CastSpell(HK_R, target)
 		end
 	end
@@ -1055,7 +1055,7 @@ function Veigar:castIgnite(target)
 
 	if not self.ignite[1] == true then return end
 
-	if self.Menu._COMBO._IGNITE.ignLife:Value() <= GetLifePercentage(target) then
+	if self.Menu._COMBO._IGNITE.ignLife:Value() <= getLifePercentage(target) then
 		if self.ready(self.ignite[2]) then
 			Control.CastSpell(self.ignite[3], target)
 		end
