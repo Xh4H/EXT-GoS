@@ -270,7 +270,7 @@ function Veigar:__init()
 			self.ignite = {false}
 		end
 	end;
-	self.Tick = GetTickCount()
+	self.TickCount = GetTickCount()
 	self.spells = {"Q", "W", "E", "R"}
 	self.spell = { 
 		["_Q"] = {
@@ -1166,7 +1166,7 @@ function Veigar:modes()
 			end
 		end,]]
 		["LaneClear"] = function()
-			if GetTickCount() - self.Tick > 1000 then
+			if GetTickCount() - self.TickCount > 1000 then
 				if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
 					local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
 					if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
@@ -1179,11 +1179,11 @@ function Veigar:modes()
 						Control.CastSpell(HK_W, BestPos)
 					end
 				end
-				self.Tick = GetTickCount()
+				self.TickCount = GetTickCount()
 			end
 		end,
 		["Clear"] = function()
-			if GetTickCount() - self.Tick > 1000 then
+			if GetTickCount() - self.TickCount > 1000 then
 				if self.Menu._LaneClear._Q.qBool:Value() == true and self.Menu._LaneClear._Q.qMana:Value() <= getManaPercentage(myHero) then
 					local BestPos, BestHit = GetBestLinearFarmPos(self.spell["_Q"].range, self.spell["_Q"].width)
 					if BestPos and BestHit >= self.Menu._LaneClear._Q.mwQ:Value() then
@@ -1196,11 +1196,11 @@ function Veigar:modes()
 						Control.CastSpell(HK_W, BestPos)
 					end
 				end
-				self.Tick = GetTickCount()
+				self.TickCount = GetTickCount()
 			end
 		end,
 		["LastHit"] = function()
-			if GetTickCount() - self.Tick > 1000 then
+			if GetTickCount() - self.TickCount > 1000 then
 				if self.Menu._LastHit._Q.qBool:Value() == false then return end
 				if self.ready(_Q) then
 					for z = 1, Game.MinionCount() do
@@ -1215,11 +1215,11 @@ function Veigar:modes()
 						end
 					end
 				end
-				self.Tick = GetTickCount()
+				self.TickCount = GetTickCount()
 			end
 		end,
 		["Lasthit"] = function()
-			if GetTickCount() - self.Tick > 1000 then
+			if GetTickCount() - self.TickCount > 1000 then
 				if self.Menu._LastHit._Q.qBool:Value() == false then return end
 				if self.ready(_Q) then
 					for z = 1, Game.MinionCount() do
@@ -1234,7 +1234,7 @@ function Veigar:modes()
 						end
 					end
 				end
-				self.Tick = GetTickCount()
+				self.TickCount = GetTickCount()
 			end
 		end,
 	}
