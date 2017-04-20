@@ -147,6 +147,9 @@ function getLifePercentage(unit)
 	return 100 * unit.health / unit.maxHealth
 end
 
+local GetLifePercentage = getLifePercentage
+
+
 function getManaPercentage(unit)
 	return 100 * unit.mana / unit.mana
 end
