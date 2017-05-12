@@ -12,7 +12,7 @@ do
 	for i = 1, Game.HeroCount() do
 		local hero = Game.Hero(i)
 		if not hero or hero.charName == "" then break end
-		if tonumber(hero.team) == 200 then
+		if myHero.team ~= hero.team then
 			table.insert(__enem, hero.charName)
 			table.insert(__enemObj, hero)
 		end
